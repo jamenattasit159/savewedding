@@ -1,0 +1,1451 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🎊 ระบบซองแต่งงาน</title>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --gold: #d4a832;
+            --gold-light: #f0d060;
+            --gold-dark: #a07820;
+            --pink: #e8a0b4;
+            --pink-dark: #c06080;
+            --bg: #1a0a12;
+            --card: #2a1520;
+            --card2: #3a2030;
+            --text: #f5e6ee;
+            --text-muted: #a08090;
+            --success: #4caf82;
+            --danger: #e05050;
+            --info: #5ab4e8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(212, 168, 50, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(232, 160, 180, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 16px;
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            text-align: center;
+            padding: 24px 0 16px;
+        }
+
+        header .emoji {
+            font-size: 2.5rem;
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--gold), var(--gold-light), var(--pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 6px 0 4px;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* Sheets status bar */
+        .sheets-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(76, 175, 130, 0.08);
+            border: 1px solid rgba(76, 175, 130, 0.2);
+            border-radius: 10px;
+            padding: 8px 14px;
+            margin-bottom: 14px;
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .sheets-bar:hover {
+            background: rgba(76, 175, 130, 0.14);
+        }
+
+        .sheets-bar.not-set {
+            background: rgba(212, 168, 50, 0.08);
+            border-color: rgba(212, 168, 50, 0.2);
+        }
+
+        .sheets-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            background: var(--success);
+        }
+
+        .sheets-dot.off {
+            background: var(--text-muted);
+        }
+
+        .sheets-label {
+            flex: 1;
+            color: var(--text-muted);
+        }
+
+        .sheets-label strong {
+            color: var(--text);
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            background: var(--card);
+            border-radius: 14px;
+            padding: 6px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(212, 168, 50, 0.15);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 10px;
+            background: transparent;
+            color: var(--text-muted);
+            font-family: 'Sarabun', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+            color: #1a0a12;
+            font-weight: 700;
+            box-shadow: 0 2px 12px rgba(212, 168, 50, 0.35);
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(212, 168, 50, 0.12);
+        }
+
+        .card-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Camera */
+        .camera-wrapper {
+            position: relative;
+            background: #0d0610;
+            border-radius: 12px;
+            overflow: hidden;
+            aspect-ratio: 4/3;
+            border: 2px dashed rgba(212, 168, 50, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        #canvas {
+            display: none;
+        }
+
+        #preview-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+            border-radius: 10px;
+        }
+
+        .camera-placeholder {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 20px;
+        }
+
+        .camera-placeholder .icon {
+            font-size: 3rem;
+            margin-bottom: 8px;
+        }
+
+        .camera-placeholder p {
+            font-size: 0.85rem;
+        }
+
+        .capture-flash {
+            position: absolute;
+            inset: 0;
+            background: white;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.1s;
+        }
+
+        .capture-flash.flash {
+            opacity: 0.8;
+        }
+
+        /* Buttons */
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Sarabun', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+        }
+
+        .btn-gold {
+            background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+            color: #1a0a12;
+            box-shadow: 0 3px 15px rgba(212, 168, 50, 0.3);
+        }
+
+        .btn-gold:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 20px rgba(212, 168, 50, 0.45);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid rgba(212, 168, 50, 0.4);
+            color: var(--gold);
+        }
+
+        .btn-outline:hover {
+            background: rgba(212, 168, 50, 0.08);
+        }
+
+        .btn-pink {
+            background: linear-gradient(135deg, var(--pink-dark), var(--pink));
+            color: white;
+            box-shadow: 0 3px 15px rgba(192, 96, 128, 0.3);
+        }
+
+        .btn-pink:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-sm {
+            padding: 8px 14px;
+            font-size: 0.85rem;
+            width: auto;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .save-btn {
+            background: linear-gradient(135deg, #2a8060, var(--success));
+            color: white;
+            box-shadow: 0 3px 15px rgba(76, 175, 130, 0.3);
+        }
+
+        .save-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 20px rgba(76, 175, 130, 0.4);
+        }
+
+        .btn[disabled] {
+            opacity: 0.55;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* OCR status */
+        .ocr-status {
+            display: none;
+            background: var(--card2);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 12px;
+            text-align: center;
+            border: 1px solid rgba(212, 168, 50, 0.15);
+        }
+
+        .ocr-status.show {
+            display: block;
+        }
+
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid rgba(212, 168, 50, 0.2);
+            border-top-color: var(--gold);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .progress-bar-wrap {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 99px;
+            height: 6px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-dark), var(--gold));
+            border-radius: 99px;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        /* Review panel */
+        #review-panel {
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        #review-panel.show {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Form fields */
+        .field-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--gold);
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .field-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1.5px solid rgba(212, 168, 50, 0.2);
+            border-radius: 10px;
+            padding: 10px 14px;
+            color: var(--text);
+            font-family: 'Sarabun', sans-serif;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .field-input:focus {
+            outline: none;
+            border-color: var(--gold);
+            background: rgba(212, 168, 50, 0.05);
+        }
+
+        .field-group {
+            margin-bottom: 14px;
+        }
+
+        .money-input-wrap {
+            position: relative;
+        }
+
+        .money-input-wrap .currency {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gold);
+            font-weight: 600;
+        }
+
+        .money-input-wrap .field-input {
+            padding-left: 36px;
+        }
+
+        .quick-amounts {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .quick-btn {
+            padding: 5px 12px;
+            background: rgba(212, 168, 50, 0.1);
+            border: 1px solid rgba(212, 168, 50, 0.25);
+            border-radius: 99px;
+            color: var(--gold);
+            font-family: 'Sarabun', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.18s;
+        }
+
+        .quick-btn:hover {
+            background: rgba(212, 168, 50, 0.2);
+        }
+
+        .ocr-raw {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            max-height: 80px;
+            overflow-y: auto;
+            margin-bottom: 4px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        .ocr-hint {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 14px;
+        }
+
+        .field-select {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1.5px solid rgba(212, 168, 50, 0.2);
+            border-radius: 10px;
+            padding: 10px 14px;
+            color: var(--text);
+            font-family: 'Sarabun', sans-serif;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+            -webkit-appearance: none;
+        }
+
+        .field-select:focus {
+            outline: none;
+            border-color: var(--gold);
+        }
+
+        .field-select option {
+            background: #2a1520;
+        }
+
+        /* Summary / List */
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .stat-row:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .stat-value {
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: var(--gold);
+        }
+
+        .stat-total {
+            font-size: 1.2rem;
+            color: var(--gold-light);
+        }
+
+        .guest-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .guest-item:last-child {
+            border-bottom: none;
+        }
+
+        .guest-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #1a0a12;
+            flex-shrink: 0;
+        }
+
+        .guest-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .guest-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .guest-meta {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .guest-amount {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--success);
+            text-align: right;
+        }
+
+        .guest-amount span {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 400;
+            color: var(--text-muted);
+        }
+
+        .guest-del {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px;
+            font-size: 1rem;
+            transition: color 0.2s;
+        }
+
+        .guest-del:hover {
+            color: var(--danger);
+        }
+
+        .synced-dot {
+            font-size: 0.65rem;
+            display: inline-block;
+            margin-left: 4px;
+        }
+
+        .search-wrap {
+            position: relative;
+            margin-bottom: 14px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .search-input {
+            width: 100%;
+            background: var(--card2);
+            border: 1.5px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 10px 14px 10px 36px;
+            color: var(--text);
+            font-family: 'Sarabun', sans-serif;
+            font-size: 0.9rem;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: rgba(212, 168, 50, 0.4);
+        }
+
+        .empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty .icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .export-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(212, 168, 50, 0.1);
+            border: 1px solid rgba(212, 168, 50, 0.25);
+            border-radius: 99px;
+            color: var(--gold);
+            font-family: 'Sarabun', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.18s;
+        }
+
+        .export-btn:hover {
+            background: rgba(212, 168, 50, 0.2);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 99px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .badge-family {
+            background: rgba(232, 160, 180, 0.2);
+            color: var(--pink);
+        }
+
+        .badge-friend {
+            background: rgba(76, 175, 130, 0.2);
+            color: var(--success);
+        }
+
+        .badge-work {
+            background: rgba(212, 168, 50, 0.2);
+            color: var(--gold);
+        }
+
+        .badge-other {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-muted);
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: var(--success);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 99px;
+            font-family: 'Sarabun', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 9999;
+            white-space: nowrap;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 24px;
+            width: 100%;
+            max-width: 420px;
+            border: 1px solid rgba(212, 168, 50, 0.2);
+            animation: slideIn 0.3s ease;
+        }
+
+        .modal-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--gold);
+            margin-bottom: 16px;
+        }
+
+        .modal-body {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.7;
+            margin-bottom: 16px;
+        }
+
+        .modal-body code {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.82rem;
+            color: var(--gold-light);
+        }
+
+        .step-list {
+            counter-reset: step;
+            list-style: none;
+            padding: 0;
+            margin: 10px 0;
+        }
+
+        .step-list li {
+            counter-increment: step;
+            padding: 6px 0 6px 32px;
+            position: relative;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.85rem;
+        }
+
+        .step-list li:last-child {
+            border-bottom: none;
+        }
+
+        .step-list li::before {
+            content: counter(step);
+            position: absolute;
+            left: 0;
+            top: 6px;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: rgba(212, 168, 50, 0.2);
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .url-input-wrap {
+            margin-top: 14px;
+        }
+
+        .url-hint {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+
+        <header>
+            <div class="emoji">🌸</div>
+            <h1>ซองแต่งงาน</h1>
+            <p>บันทึกรายชื่อและของขวัญจากแขกทุกท่าน</p>
+        </header>
+
+        <!-- Google Sheets status bar -->
+        <div class="sheets-bar not-set" id="sheets-bar" onclick="openSheetsModal()">
+            <div class="sheets-dot off" id="sheets-dot"></div>
+            <div class="sheets-label" id="sheets-label">☁️ ยังไม่ได้เชื่อม Google Sheets —
+                <strong>แตะเพื่อตั้งค่า</strong></div>
+            <span style="color:var(--text-muted); font-size:0.8rem;">⚙️</span>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('scan')">📷 สแกนซอง</button>
+            <button class="tab" onclick="switchTab('list')">📋 รายชื่อ</button>
+            <button class="tab" onclick="switchTab('summary')">📊 สรุป</button>
+        </div>
+
+        <!-- SCAN section -->
+        <div class="section active" id="tab-scan">
+            <div class="card">
+                <div class="card-title">📷 ถ่ายรูปหรืออัปโหลดรูป</div>
+                <div class="camera-wrapper" id="camera-wrapper">
+                    <video id="video" autoplay playsinline></video>
+                    <canvas id="canvas"></canvas>
+                    <img id="preview-img" alt="ภาพที่ถ่าย" />
+                    <div class="capture-flash" id="flash"></div>
+                    <div class="camera-placeholder" id="cam-placeholder">
+                        <div class="icon">📷</div>
+                        <p>กดปุ่มด้านล่างเพื่อเปิดกล้อง<br>หรืออัปโหลดรูปภาพ</p>
+                    </div>
+                </div>
+                <div class="btn-row">
+                    <button class="btn btn-gold" onclick="startCamera()">🎥 เปิดกล้อง</button>
+                    <label class="btn btn-outline" style="cursor:pointer;">
+                        🖼 อัปโหลด
+                        <input type="file" id="file-input" accept="image/*" onchange="handleFile(event)" />
+                    </label>
+                </div>
+                <div id="capture-row" style="display:none; margin-top:10px;">
+                    <button class="btn btn-pink" onclick="capturePhoto()">📸 ถ่ายภาพ</button>
+                </div>
+                <div id="retake-row" style="display:none; margin-top:10px;">
+                    <button class="btn btn-outline" onclick="retake()">🔄 ถ่ายใหม่</button>
+                </div>
+            </div>
+
+            <!-- OCR loading -->
+            <div class="ocr-status" id="ocr-status">
+                <div class="spinner"></div>
+                <div style="color:var(--gold); font-weight:600;">กำลังอ่านชื่อจากรูป...</div>
+                <div style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;" id="ocr-msg">กรุณารอสักครู่
+                </div>
+                <div class="progress-bar-wrap">
+                    <div class="progress-bar" id="progress-bar"></div>
+                </div>
+            </div>
+
+            <!-- Review panel -->
+            <div id="review-panel">
+                <div class="card">
+                    <div class="card-title">🔍 ตรวจสอบข้อมูล</div>
+                    <div class="field-group">
+                        <label class="field-label">📝 ข้อความที่อ่านได้จากรูป</label>
+                        <div class="ocr-raw" id="ocr-raw">-</div>
+                        <div class="ocr-hint">* ตรวจสอบและแก้ไขข้อมูลด้านล่างก่อนบันทึก</div>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">👤 ชื่อแขก</label>
+                        <input class="field-input" type="text" id="guest-name" placeholder="ชื่อ-นามสกุล" />
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">👥 ความสัมพันธ์</label>
+                        <select class="field-select" id="guest-relation">
+                            <option value="family">👨‍👩‍👧 ครอบครัว</option>
+                            <option value="friend" selected>👫 เพื่อน</option>
+                            <option value="work">💼 เพื่อนร่วมงาน</option>
+                            <option value="other">🙏 อื่นๆ</option>
+                        </select>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">💰 จำนวนเงิน (บาท)</label>
+                        <div class="money-input-wrap">
+                            <span class="currency">฿</span>
+                            <input class="field-input" type="number" id="guest-amount" placeholder="0" min="0"
+                                step="100" />
+                        </div>
+                        <div class="quick-amounts">
+                            <button class="quick-btn" onclick="setAmount(500)">500</button>
+                            <button class="quick-btn" onclick="setAmount(1000)">1,000</button>
+                            <button class="quick-btn" onclick="setAmount(1500)">1,500</button>
+                            <button class="quick-btn" onclick="setAmount(2000)">2,000</button>
+                            <button class="quick-btn" onclick="setAmount(3000)">3,000</button>
+                            <button class="quick-btn" onclick="setAmount(5000)">5,000</button>
+                        </div>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">📌 หมายเหตุ</label>
+                        <input class="field-input" type="text" id="guest-note"
+                            placeholder="เช่น มากับครอบครัว, ส่งซองมา" />
+                    </div>
+                    <div class="btn-row">
+                        <button class="btn save-btn" id="save-btn" onclick="saveGuest()">✅ บันทึก</button>
+                        <button class="btn btn-outline btn-sm" onclick="cancelReview()"
+                            style="flex:0 0 auto; width:auto; padding:12px 20px;">ยกเลิก</button>
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align:center; margin-top:4px;">
+                <button class="btn btn-outline" style="max-width:220px; margin:0 auto;" onclick="showManual()">✏️
+                    กรอกเองโดยไม่ถ่ายรูป</button>
+            </div>
+        </div>
+
+        <!-- LIST section -->
+        <div class="section" id="tab-list">
+            <div class="card" style="padding-bottom:4px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <div class="card-title" style="margin-bottom:0;">📋 รายชื่อแขก</div>
+                    <button class="export-btn" onclick="exportCSV()">⬇️ Export CSV</button>
+                </div>
+                <div class="search-wrap">
+                    <span class="search-icon">🔍</span>
+                    <input class="search-input" type="text" placeholder="ค้นหาชื่อแขก..." id="search-input"
+                        oninput="renderList()" />
+                </div>
+            </div>
+            <div class="card" id="guest-list-container" style="padding-top:4px;"></div>
+        </div>
+
+        <!-- SUMMARY section -->
+        <div class="section" id="tab-summary">
+            <div class="card" id="summary-card"></div>
+            <div class="card" id="summary-breakdown"></div>
+        </div>
+
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Google Sheets Setup Modal -->
+    <div class="modal-overlay" id="modal-overlay" onclick="closeSheetsModal(event)">
+        <div class="modal">
+            <div class="modal-title">☁️ เชื่อม Google Sheets</div>
+            <div class="modal-body">
+                ต้องสร้าง <strong>Google Apps Script</strong> 1 ครั้ง เพื่อรับข้อมูลจากแอปนี้และเขียนลง Sheet ของคุณ
+                <ol class="step-list">
+                    <li>ไปที่ <strong>script.google.com</strong> → สร้างโปรเจกต์ใหม่</li>
+                    <li>ลบโค้ดเดิมออก แล้ว<strong>วางโค้ด</strong>จากกล่องด้านล่าง</li>
+                    <li>กด <strong>Deploy → New deployment</strong> → เลือก <em>Web app</em></li>
+                    <li>Execute as: <em>Me</em>, Who can access: <em>Anyone</em> → กด Deploy</li>
+                    <li>คัดลอก <strong>Web app URL</strong> มาวางด้านล่าง</li>
+                </ol>
+                <div style="margin-top:10px;">
+                    <button class="quick-btn" onclick="copyScript()" style="font-size:0.85rem; padding:8px 16px;">📋
+                        คัดลอกโค้ด Apps Script</button>
+                </div>
+            </div>
+            <div class="url-input-wrap">
+                <label class="field-label">🔗 Web App URL (จาก Apps Script)</label>
+                <input class="field-input" type="url" id="script-url-input"
+                    placeholder="https://script.google.com/macros/s/..." />
+                <div class="url-hint">วาง URL ที่ได้จากขั้นตอนที่ 5</div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-gold" onclick="saveScriptUrl()">✅ บันทึกและเชื่อมต่อ</button>
+                <button class="btn btn-outline btn-sm" onclick="closeSheetsModal(null)"
+                    style="width:auto; padding:12px 20px;">ยกเลิก</button>
+            </div>
+            <div style="margin-top:12px; text-align:center;">
+                <button onclick="clearScriptUrl()"
+                    style="background:none; border:none; color:var(--danger); font-family:'Sarabun',sans-serif; font-size:0.8rem; cursor:pointer;">🗑
+                    ยกเลิกการเชื่อมต่อ</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== Apps Script template =====
+        const APPS_SCRIPT_CODE = `function doPost(e) {
+  try {
+    var data = JSON.parse(e.postData.contents);
+    var ss = SpreadsheetApp.openById('1l8bcxgzwZQHl5GYSQeBHXhW79UDxkZHCqLmqyAmyIHI');
+    var sheet = ss.getActiveSheet();
+
+    // Add header row if sheet is empty
+    if (sheet.getLastRow() === 0) {
+      sheet.appendRow(['ชื่อแขก', 'ความสัมพันธ์', 'จำนวนเงิน (บาท)', 'หมายเหตุ', 'วันเวลา']);
+      sheet.getRange(1,1,1,5).setFontWeight('bold');
+    }
+
+    sheet.appendRow([data.name, data.relation, data.amount, data.note, data.time]);
+
+    return ContentService
+      .createTextOutput(JSON.stringify({ status: 'ok' }))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ status: 'error', message: err.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function doGet(e) {
+  return ContentService
+    .createTextOutput(JSON.stringify({ status: 'ok', message: 'Wedding Envelope API ready' }))
+    .setMimeType(ContentService.MimeType.JSON);
+}`;
+
+        // ===== State =====
+        let guests = JSON.parse(localStorage.getItem('weddingGuests') || '[]');
+        let stream = null;
+        let currentTab = 'scan';
+        let scriptUrl = localStorage.getItem('sheetsScriptUrl') || '';
+
+        // Init
+        updateSheetsBar();
+
+        // ===== Sheets Bar =====
+        function updateSheetsBar() {
+            const bar = document.getElementById('sheets-bar');
+            const dot = document.getElementById('sheets-dot');
+            const label = document.getElementById('sheets-label');
+            if (scriptUrl) {
+                bar.classList.remove('not-set');
+                dot.classList.remove('off');
+                label.innerHTML = '☁️ เชื่อม Google Sheets แล้ว &nbsp;<strong>แตะเพื่อเปลี่ยน</strong>';
+            } else {
+                bar.classList.add('not-set');
+                dot.classList.add('off');
+                label.innerHTML = '☁️ ยังไม่ได้เชื่อม Google Sheets — <strong>แตะเพื่อตั้งค่า</strong>';
+            }
+        }
+
+        // ===== Modal =====
+        function openSheetsModal() {
+            document.getElementById('script-url-input').value = scriptUrl;
+            document.getElementById('modal-overlay').classList.add('show');
+        }
+        function closeSheetsModal(e) {
+            if (e === null || e.target === document.getElementById('modal-overlay')) {
+                document.getElementById('modal-overlay').classList.remove('show');
+            }
+        }
+        function saveScriptUrl() {
+            const url = document.getElementById('script-url-input').value.trim();
+            if (url && !url.startsWith('https://script.google.com/macros/s/')) {
+                showToast('❌ URL ไม่ถูกต้อง ต้องขึ้นต้นด้วย https://script.google.com/macros/s/', '#e05050');
+                return;
+            }
+            scriptUrl = url;
+            localStorage.setItem('sheetsScriptUrl', url);
+            updateSheetsBar();
+            document.getElementById('modal-overlay').classList.remove('show');
+            showToast(url ? '✅ เชื่อม Google Sheets สำเร็จ!' : '🔌 ยกเลิกการเชื่อมต่อแล้ว');
+        }
+        function clearScriptUrl() {
+            scriptUrl = '';
+            localStorage.removeItem('sheetsScriptUrl');
+            document.getElementById('script-url-input').value = '';
+            updateSheetsBar();
+            document.getElementById('modal-overlay').classList.remove('show');
+            showToast('🔌 ยกเลิกการเชื่อมต่อแล้ว', '#a08090');
+        }
+        function copyScript() {
+            navigator.clipboard.writeText(APPS_SCRIPT_CODE).then(() => {
+                showToast('📋 คัดลอกโค้ดแล้ว! ไปวางใน Apps Script ได้เลย');
+            }).catch(() => {
+                // Fallback: show in textarea
+                const ta = document.createElement('textarea');
+                ta.value = APPS_SCRIPT_CODE;
+                document.body.appendChild(ta); ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                showToast('📋 คัดลอกโค้ดแล้ว!');
+            });
+        }
+
+        // ===== Tab =====
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab').forEach((t, i) => {
+                t.classList.toggle('active', ['scan', 'list', 'summary'][i] === tab);
+            });
+            document.querySelectorAll('.section').forEach((s, i) => {
+                s.classList.toggle('active', ['tab-scan', 'tab-list', 'tab-summary'][i] === `tab-${tab}`);
+            });
+            if (tab === 'list') renderList();
+            if (tab === 'summary') renderSummary();
+        }
+
+        // ===== Camera =====
+        async function startCamera() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
+                const video = document.getElementById('video');
+                video.srcObject = stream; video.style.display = 'block';
+                document.getElementById('cam-placeholder').style.display = 'none';
+                document.getElementById('preview-img').style.display = 'none';
+                document.getElementById('capture-row').style.display = 'block';
+                document.getElementById('retake-row').style.display = 'none';
+                document.getElementById('review-panel').classList.remove('show');
+                document.getElementById('ocr-status').classList.remove('show');
+            } catch (e) {
+                showToast('❌ ไม่สามารถเปิดกล้องได้ กรุณาอนุญาตการเข้าถึงกล้อง', '#e05050');
+            }
+        }
+
+        function capturePhoto() {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            const flash = document.getElementById('flash');
+            flash.classList.add('flash'); setTimeout(() => flash.classList.remove('flash'), 200);
+            const img = document.getElementById('preview-img');
+            img.src = canvas.toDataURL('image/jpeg', 0.9); img.style.display = 'block';
+            video.style.display = 'none';
+            document.getElementById('capture-row').style.display = 'none';
+            document.getElementById('retake-row').style.display = 'block';
+            if (stream) stream.getTracks().forEach(t => t.stop());
+            runOCR(canvas.toDataURL('image/jpeg', 0.9));
+        }
+
+        function handleFile(e) {
+            const file = e.target.files[0]; if (!file) return;
+            const reader = new FileReader();
+            reader.onload = ev => {
+                const img = document.getElementById('preview-img');
+                img.src = ev.target.result; img.style.display = 'block';
+                document.getElementById('cam-placeholder').style.display = 'none';
+                document.getElementById('video').style.display = 'none';
+                document.getElementById('capture-row').style.display = 'none';
+                document.getElementById('retake-row').style.display = 'block';
+                if (stream) stream.getTracks().forEach(t => t.stop());
+                runOCR(ev.target.result);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function retake() {
+            document.getElementById('preview-img').style.display = 'none';
+            document.getElementById('retake-row').style.display = 'none';
+            document.getElementById('cam-placeholder').style.display = 'block';
+            document.getElementById('review-panel').classList.remove('show');
+            document.getElementById('ocr-status').classList.remove('show');
+            document.getElementById('file-input').value = '';
+        }
+
+        // ===== OCR =====
+        async function runOCR(imageData) {
+            const status = document.getElementById('ocr-status');
+            const msg = document.getElementById('ocr-msg');
+            const bar = document.getElementById('progress-bar');
+            status.classList.add('show');
+            document.getElementById('review-panel').classList.remove('show');
+            try {
+                const result = await Tesseract.recognize(imageData, 'tha+eng', {
+                    logger: m => {
+                        if (m.status === 'recognizing text') {
+                            const pct = Math.round(m.progress * 100);
+                            bar.style.width = pct + '%';
+                            msg.textContent = `กำลังประมวลผล ${pct}%`;
+                        } else {
+                            msg.textContent = m.status === 'loading language traineddata' ? 'กำลังโหลดภาษาไทย...' : m.status;
+                        }
+                    }
+                });
+                status.classList.remove('show');
+                showReview(result.data.text.trim());
+            } catch (e) {
+                status.classList.remove('show');
+                showReview('');
+                showToast('⚠️ อ่านข้อความไม่ได้ กรุณากรอกเอง', '#d4a832');
+            }
+        }
+
+        function showReview(rawText) {
+            document.getElementById('ocr-raw').textContent = rawText || '(ไม่พบข้อความในรูป)';
+            const lines = rawText.split('\n').map(l => l.trim()).filter(l => l.length > 1);
+            let guessedName = '';
+            for (const line of lines) {
+                if (/^[\d\s\-\/]+$/.test(line)) continue;
+                if (line.length > 1 && line.length < 60) { guessedName = line; break; }
+            }
+            document.getElementById('guest-name').value = guessedName;
+            document.getElementById('guest-amount').value = '';
+            document.getElementById('guest-note').value = '';
+            document.getElementById('review-panel').classList.add('show');
+            document.getElementById('review-panel').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function showManual() {
+            document.getElementById('ocr-raw').textContent = '(กรอกด้วยตนเอง)';
+            document.getElementById('guest-name').value = '';
+            document.getElementById('guest-amount').value = '';
+            document.getElementById('guest-note').value = '';
+            document.getElementById('review-panel').classList.add('show');
+            document.getElementById('review-panel').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function cancelReview() {
+            document.getElementById('review-panel').classList.remove('show');
+        }
+
+        // ===== Save =====
+        async function saveGuest() {
+            const name = document.getElementById('guest-name').value.trim();
+            const amount = parseFloat(document.getElementById('guest-amount').value) || 0;
+            const relation = document.getElementById('guest-relation').value;
+            const note = document.getElementById('guest-note').value.trim();
+
+            if (!name) { showToast('❌ กรุณากรอกชื่อแขก', '#e05050'); return; }
+            if (amount <= 0) { showToast('❌ กรุณากรอกจำนวนเงิน', '#e05050'); return; }
+
+            const guest = {
+                id: Date.now(), name, amount, relation, note,
+                time: new Date().toLocaleString('th-TH'),
+                synced: false
+            };
+
+            guests.unshift(guest);
+            save();
+
+            document.getElementById('review-panel').classList.remove('show');
+            document.getElementById('retake-row').style.display = 'none';
+            document.getElementById('preview-img').style.display = 'none';
+            document.getElementById('cam-placeholder').style.display = 'block';
+            document.getElementById('file-input').value = '';
+
+            showToast(`✅ บันทึก ${name} (฿${amount.toLocaleString('th-TH')}) แล้ว`);
+
+            // Sync to Google Sheets
+            if (scriptUrl) {
+                syncToSheets(guest);
+            }
+        }
+
+        async function syncToSheets(guest) {
+            try {
+                showToast('☁️ กำลังบันทึกลง Google Sheets...', '#5ab4e8');
+                const res = await fetch(scriptUrl, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        name: guest.name,
+                        relation: relationLabel(guest.relation),
+                        amount: guest.amount,
+                        note: guest.note,
+                        time: guest.time
+                    })
+                });
+                if (res.ok) {
+                    // Mark as synced
+                    const idx = guests.findIndex(g => g.id === guest.id);
+                    if (idx !== -1) { guests[idx].synced = true; save(); }
+                    showToast('☁️ บันทึกลง Google Sheets สำเร็จ!', '#4caf82');
+                } else {
+                    showToast('⚠️ Google Sheets ตอบกลับผิดพลาด', '#d4a832');
+                }
+            } catch (e) {
+                showToast('⚠️ ไม่สามารถส่งข้อมูลไป Google Sheets ได้', '#d4a832');
+            }
+        }
+
+        // Retry unsynced items
+        async function syncPending() {
+            if (!scriptUrl) return;
+            const unsynced = guests.filter(g => !g.synced);
+            if (!unsynced.length) { showToast('✅ ข้อมูลทั้งหมดซิงค์แล้ว'); return; }
+            showToast(`🔄 กำลังซิงค์ ${unsynced.length} รายการ...`, '#5ab4e8');
+            for (const g of unsynced) await syncToSheets(g);
+        }
+
+        function save() {
+            localStorage.setItem('weddingGuests', JSON.stringify(guests));
+        }
+
+        // ===== Quick Amounts =====
+        function setAmount(n) { document.getElementById('guest-amount').value = n; }
+
+        // ===== List =====
+        function renderList() {
+            const q = (document.getElementById('search-input')?.value || '').toLowerCase();
+            const filtered = guests.filter(g => g.name.toLowerCase().includes(q));
+            const container = document.getElementById('guest-list-container');
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="empty"><div class="icon">🌸</div><p>${q ? 'ไม่พบชื่อที่ค้นหา' : 'ยังไม่มีรายการ'}</p></div>`;
+                return;
+            }
+            const unsyncedCount = guests.filter(g => !g.synced && scriptUrl).length;
+            let header = '';
+            if (unsyncedCount > 0) {
+                header = `<div style="text-align:center; margin-bottom:12px;">
+      <button class="quick-btn" onclick="syncPending()" style="font-size:0.82rem;">
+        🔄 ซิงค์ที่ค้างอยู่ (${unsyncedCount} รายการ)
+      </button>
+    </div>`;
+            }
+            container.innerHTML = header + filtered.map(g => `
+    <div class="guest-item" id="item-${g.id}">
+      <div class="guest-avatar">${g.name.charAt(0)}</div>
+      <div class="guest-info">
+        <div class="guest-name">
+          ${g.name}
+          ${scriptUrl ? `<span class="synced-dot" title="${g.synced ? 'ซิงค์แล้ว' : 'ยังไม่ซิงค์'}">${g.synced ? '🟢' : '🟡'}</span>` : ''}
+        </div>
+        <div class="guest-meta">
+          <span class="badge ${badgeClass(g.relation)}">${relationLabel(g.relation)}</span>
+          ${g.note ? ` · ${g.note}` : ''}
+        </div>
+      </div>
+      <div class="guest-amount">
+        ฿${g.amount.toLocaleString('th-TH')}
+        <span>${g.time}</span>
+      </div>
+      <button class="guest-del" onclick="deleteGuest(${g.id})" title="ลบ">✕</button>
+    </div>
+  `).join('');
+        }
+
+        function badgeClass(r) {
+            return { family: 'badge-family', friend: 'badge-friend', work: 'badge-work', other: 'badge-other' }[r] || 'badge-other';
+        }
+        function relationLabel(r) {
+            return { family: 'ครอบครัว', friend: 'เพื่อน', work: 'เพื่อนร่วมงาน', other: 'อื่นๆ' }[r] || r;
+        }
+
+        function deleteGuest(id) {
+            if (!confirm('ต้องการลบรายการนี้?')) return;
+            guests = guests.filter(g => g.id !== id);
+            save(); renderList();
+            showToast('🗑️ ลบรายการแล้ว', '#e05050');
+        }
+
+        // ===== Summary =====
+        function renderSummary() {
+            const total = guests.reduce((s, g) => s + g.amount, 0);
+            const byRelation = {};
+            guests.forEach(g => { byRelation[g.relation] = (byRelation[g.relation] || 0) + g.amount; });
+            const syncedCount = guests.filter(g => g.synced).length;
+
+            document.getElementById('summary-card').innerHTML = `
+    <div class="card-title">📊 สรุปภาพรวม</div>
+    <div class="stat-row">
+      <span class="stat-label">👥 จำนวนแขกทั้งหมด</span>
+      <span class="stat-value">${guests.length} คน</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">💰 รวมทั้งหมด</span>
+      <span class="stat-value stat-total">฿${total.toLocaleString('th-TH')}</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">📈 เฉลี่ยต่อซอง</span>
+      <span class="stat-value">฿${guests.length ? (total / guests.length).toLocaleString('th-TH', { maximumFractionDigits: 0 }) : 0}</span>
+    </div>
+    ${scriptUrl ? `<div class="stat-row">
+      <span class="stat-label">☁️ ซิงค์ Google Sheets</span>
+      <span class="stat-value" style="color:var(--success)">${syncedCount}/${guests.length}</span>
+    </div>` : ''}
+  `;
+
+            const breakdown = Object.entries(byRelation).map(([k, v]) => `
+    <div class="stat-row">
+      <span class="stat-label"><span class="badge ${badgeClass(k)}">${relationLabel(k)}</span></span>
+      <span class="stat-value">฿${v.toLocaleString('th-TH')}</span>
+    </div>
+  `).join('');
+
+            document.getElementById('summary-breakdown').innerHTML = `
+    <div class="card-title">🏷️ แยกตามความสัมพันธ์</div>
+    ${breakdown || '<div style="color:var(--text-muted);font-size:0.9rem;">ยังไม่มีข้อมูล</div>'}
+  `;
+        }
+
+        // ===== Export CSV =====
+        function exportCSV() {
+            if (!guests.length) { showToast('❌ ยังไม่มีข้อมูล', '#e05050'); return; }
+            const header = 'ชื่อ,ความสัมพันธ์,จำนวนเงิน,หมายเหตุ,วันเวลา';
+            const rows = guests.map(g => `"${g.name}","${relationLabel(g.relation)}",${g.amount},"${g.note}","${g.time}"`);
+            const csv = '\uFEFF' + [header, ...rows].join('\n');
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.href = url;
+            a.download = `ซองแต่งงาน_${new Date().toLocaleDateString('th-TH')}.csv`;
+            a.click(); URL.revokeObjectURL(url);
+            showToast('📥 Export CSV สำเร็จ');
+        }
+
+        // ===== Toast =====
+        function showToast(msg, color = '#4caf82') {
+            const t = document.getElementById('toast');
+            t.textContent = msg; t.style.background = color;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+    </script>
+</body>
+
+</html>
