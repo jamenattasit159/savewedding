@@ -3,234 +3,257 @@
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>🎊 ระบบซองแต่งงาน</title>
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --gold: #d4a832;
-            --gold-light: #f0d060;
-            --gold-dark: #a07820;
-            --pink: #e8a0b4;
-            --pink-dark: #c06080;
-            --bg: #1a0a12;
-            --card: #2a1520;
-            --card2: #3a2030;
-            --text: #f5e6ee;
-            --text-muted: #a08090;
-            --success: #4caf82;
-            --danger: #e05050;
-            --info: #5ab4e8;
+            /* Modern Color Palette */
+            --primary: #E5A8B4; /* Rose Gold / Pink */
+            --primary-dark: #D48A9A;
+            --secondary: #D4AF37; /* Elegant Gold */
+            --secondary-light: #F9E8B6;
+            --bg: #F5F7FA; /* Soft off-white */
+            --card: #FFFFFF;
+            --text-main: #2D3748;
+            --text-muted: #A0AEC0;
+            --border: #E2E8F0;
+            --success: #10B981;
+            --success-light: #D1FAE5;
+            --danger: #EF4444;
+            --danger-light: #FEE2E2;
+            --info: #3B82F6;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.06);
+            --radius-md: 16px;
+            --radius-lg: 24px;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
             font-family: 'Sarabun', sans-serif;
             background: var(--bg);
-            color: var(--text);
+            color: var(--text-main);
             min-height: 100vh;
             overflow-x: hidden;
+            padding-bottom: 80px; /* Space for bottom nav */
         }
 
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background:
-                radial-gradient(ellipse at 20% 20%, rgba(212, 168, 50, 0.08) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 80%, rgba(232, 160, 180, 0.08) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: 0;
+        /* Use Prompt font for headings for a modern look */
+        h1, h2, h3, .card-title, .modal-title, .nav-item {
+            font-family: 'Prompt', sans-serif;
         }
 
         .container {
-            max-width: 480px;
+            max-width: 500px;
             margin: 0 auto;
-            padding: 16px;
+            padding: 20px 16px;
             position: relative;
-            z-index: 1;
         }
 
+        /* Header */
         header {
             text-align: center;
-            padding: 24px 0 16px;
+            padding: 10px 0 24px;
         }
 
         header .emoji {
-            font-size: 2.5rem;
+            font-size: 2.8rem;
+            margin-bottom: 8px;
+            display: inline-block;
+            animation: bounce 2s infinite ease-in-out;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
         }
 
         header h1 {
-            font-size: 1.5rem;
+            font-size: 1.6rem;
             font-weight: 700;
-            background: linear-gradient(135deg, var(--gold), var(--gold-light), var(--pink));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin: 6px 0 4px;
+            color: var(--text-main);
+            margin-bottom: 4px;
         }
 
         header p {
             color: var(--text-muted);
-            font-size: 0.85rem;
+            font-size: 0.9rem;
         }
 
-        /* Sheets status bar */
+        /* Sheets status bar - Modern Alert style */
         .sheets-bar {
             display: flex;
             align-items: center;
-            gap: 8px;
-            background: rgba(76, 175, 130, 0.08);
-            border: 1px solid rgba(76, 175, 130, 0.2);
-            border-radius: 10px;
-            padding: 8px 14px;
-            margin-bottom: 14px;
-            font-size: 0.82rem;
+            gap: 12px;
+            background: var(--success-light);
+            border-radius: var(--radius-md);
+            padding: 12px 16px;
+            margin-bottom: 24px;
+            font-size: 0.85rem;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: all 0.2s;
+            box-shadow: var(--shadow-sm);
         }
 
-        .sheets-bar:hover {
-            background: rgba(76, 175, 130, 0.14);
-        }
+        .sheets-bar:active { transform: scale(0.98); }
 
         .sheets-bar.not-set {
-            background: rgba(212, 168, 50, 0.08);
-            border-color: rgba(212, 168, 50, 0.2);
+            background: #FFFBEB;
+            border: 1px solid #FDE68A;
         }
 
         .sheets-dot {
-            width: 8px;
-            height: 8px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
             flex-shrink: 0;
             background: var(--success);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
         }
 
         .sheets-dot.off {
-            background: var(--text-muted);
+            background: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
         }
 
         .sheets-label {
             flex: 1;
-            color: var(--text-muted);
+            color: var(--text-main);
+            font-family: 'Prompt', sans-serif;
         }
 
-        .sheets-label strong {
-            color: var(--text);
-        }
+        .sheets-label strong { color: var(--text-main); font-weight: 600; }
 
-        /* Tabs */
-        .tabs {
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             display: flex;
-            gap: 8px;
-            background: var(--card);
-            border-radius: 14px;
-            padding: 6px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(212, 168, 50, 0.15);
+            justify-content: space-around;
+            padding: 12px 16px 24px;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+            z-index: 100;
+            border-top: 1px solid var(--border);
         }
 
-        .tab {
+        .nav-item {
             flex: 1;
-            padding: 10px;
-            border: none;
-            border-radius: 10px;
-            background: transparent;
+            text-align: center;
             color: var(--text-muted);
-            font-family: 'Sarabun', sans-serif;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.25s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
         }
 
-        .tab.active {
-            background: linear-gradient(135deg, var(--gold-dark), var(--gold));
-            color: #1a0a12;
-            font-weight: 700;
-            box-shadow: 0 2px 12px rgba(212, 168, 50, 0.35);
+        .nav-icon {
+            font-size: 1.4rem;
+            transition: transform 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+        }
+
+        .nav-item.active {
+            color: var(--primary-dark);
+        }
+
+        .nav-item.active .nav-icon {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(229, 168, 180, 0.4);
         }
 
         .section {
             display: none;
+            animation: fadeIn 0.4s ease;
         }
 
-        .section.active {
-            display: block;
+        .section.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
+        /* Cards */
         .card {
             background: var(--card);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 16px;
-            border: 1px solid rgba(212, 168, 50, 0.12);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(255,255,255,0.8);
         }
 
         .card-title {
-            font-size: 0.8rem;
+            font-size: 1.1rem;
             font-weight: 600;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-            color: var(--gold);
-            margin-bottom: 14px;
+            color: var(--text-main);
+            margin-bottom: 16px;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
         }
 
         /* Camera */
         .camera-wrapper {
             position: relative;
-            background: #0d0610;
-            border-radius: 12px;
+            background: var(--bg);
+            border-radius: var(--radius-md);
             overflow: hidden;
             aspect-ratio: 4/3;
-            border: 2px dashed rgba(212, 168, 50, 0.3);
+            border: 2px dashed var(--border);
             display: flex;
             align-items: center;
             justify-content: center;
+            margin-bottom: 16px;
         }
 
-        #video {
+        #video, #preview-img {
             width: 100%;
             height: 100%;
             object-fit: cover;
             display: none;
+            border-radius: calc(var(--radius-md) - 2px);
         }
 
-        #canvas {
-            display: none;
-        }
-
-        #preview-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: none;
-            border-radius: 10px;
-        }
+        #canvas { display: none; }
 
         .camera-placeholder {
             text-align: center;
             color: var(--text-muted);
-            padding: 20px;
         }
 
         .camera-placeholder .icon {
             font-size: 3rem;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
+            opacity: 0.6;
         }
 
         .camera-placeholder p {
-            font-size: 0.85rem;
+            font-size: 0.9rem;
+            font-family: 'Prompt', sans-serif;
         }
 
         .capture-flash {
@@ -239,12 +262,10 @@
             background: white;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.1s;
+            transition: opacity 0.15s;
         }
 
-        .capture-flash.flash {
-            opacity: 0.8;
-        }
+        .capture-flash.flash { opacity: 0.9; }
 
         /* Buttons */
         .btn {
@@ -252,386 +273,170 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            padding: 12px 20px;
+            padding: 14px 24px;
             border: none;
-            border-radius: 12px;
-            font-family: 'Sarabun', sans-serif;
-            font-size: 0.95rem;
-            font-weight: 600;
+            border-radius: 14px;
+            font-family: 'Prompt', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
             cursor: pointer;
             transition: all 0.2s;
             width: 100%;
         }
 
-        .btn-gold {
-            background: linear-gradient(135deg, var(--gold-dark), var(--gold));
-            color: #1a0a12;
-            box-shadow: 0 3px 15px rgba(212, 168, 50, 0.3);
-        }
+        .btn:active { transform: scale(0.98); }
 
-        .btn-gold:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 5px 20px rgba(212, 168, 50, 0.45);
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 15px rgba(229, 168, 180, 0.4);
         }
 
         .btn-outline {
             background: transparent;
-            border: 1.5px solid rgba(212, 168, 50, 0.4);
-            color: var(--gold);
+            border: 2px solid var(--border);
+            color: var(--text-main);
         }
 
-        .btn-outline:hover {
-            background: rgba(212, 168, 50, 0.08);
-        }
+        .btn-outline:active { background: var(--bg); }
 
-        .btn-pink {
-            background: linear-gradient(135deg, var(--pink-dark), var(--pink));
+        .btn-save {
+            background: var(--success);
             color: white;
-            box-shadow: 0 3px 15px rgba(192, 96, 128, 0.3);
-        }
-
-        .btn-pink:hover {
-            transform: translateY(-1px);
-        }
-
-        .btn-sm {
-            padding: 8px 14px;
-            font-size: 0.85rem;
-            width: auto;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
         }
 
         .btn-row {
             display: flex;
-            gap: 10px;
-            margin-top: 12px;
+            gap: 12px;
+            margin-top: 16px;
         }
 
-        .save-btn {
-            background: linear-gradient(135deg, #2a8060, var(--success));
-            color: white;
-            box-shadow: 0 3px 15px rgba(76, 175, 130, 0.3);
-        }
-
-        .save-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 5px 20px rgba(76, 175, 130, 0.4);
-        }
-
-        .btn[disabled] {
-            opacity: 0.55;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-
-        /* OCR status */
-        .ocr-status {
+        /* AI status */
+        .ai-status {
             display: none;
-            background: var(--card2);
-            border-radius: 12px;
-            padding: 16px;
-            margin-top: 12px;
+            background: linear-gradient(to right, #ffffff, #fff5f7);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-top: 16px;
             text-align: center;
-            border: 1px solid rgba(212, 168, 50, 0.15);
+            box-shadow: var(--shadow-md);
+            border: 1px solid #fce7f3;
         }
 
-        .ocr-status.show {
-            display: block;
-        }
+        .ai-status.show { display: block; }
 
         .spinner {
-            width: 32px;
-            height: 32px;
-            border: 3px solid rgba(212, 168, 50, 0.2);
-            border-top-color: var(--gold);
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border);
+            border-top-color: var(--primary);
             border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin: 0 auto 10px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
         }
 
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        .progress-bar-wrap {
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 99px;
-            height: 6px;
-            margin-top: 10px;
-            overflow: hidden;
-        }
-
-        .progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, var(--gold-dark), var(--gold));
-            border-radius: 99px;
-            width: 0%;
-            transition: width 0.3s;
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         /* Review panel */
         #review-panel {
             display: none;
-            animation: slideIn 0.3s ease;
+            margin-top: 20px;
         }
 
         #review-panel.show {
             display: block;
+            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(12px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* Form fields */
+        .field-group { margin-bottom: 20px; }
+
         .field-label {
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             font-weight: 600;
-            color: var(--gold);
-            margin-bottom: 6px;
+            color: var(--text-main);
+            margin-bottom: 8px;
             display: block;
+            font-family: 'Prompt', sans-serif;
         }
 
-        .field-input {
+        .field-input, .field-select {
             width: 100%;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1.5px solid rgba(212, 168, 50, 0.2);
-            border-radius: 10px;
-            padding: 10px 14px;
-            color: var(--text);
+            background: var(--bg);
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 16px;
+            color: var(--text-main);
             font-family: 'Sarabun', sans-serif;
             font-size: 1rem;
-            transition: border-color 0.2s;
+            transition: all 0.2s;
         }
 
-        .field-input:focus {
+        .field-input:focus, .field-select:focus {
             outline: none;
-            border-color: var(--gold);
-            background: rgba(212, 168, 50, 0.05);
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(229, 168, 180, 0.15);
         }
 
-        .field-group {
-            margin-bottom: 14px;
+        .field-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23A0AEC0%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px top 50%;
+            background-size: 12px auto;
         }
 
-        .money-input-wrap {
-            position: relative;
-        }
+        .money-input-wrap { position: relative; }
 
         .money-input-wrap .currency {
             position: absolute;
-            left: 14px;
+            left: 16px;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--gold);
+            color: var(--text-muted);
             font-weight: 600;
+            font-family: 'Prompt', sans-serif;
         }
 
-        .money-input-wrap .field-input {
-            padding-left: 36px;
-        }
+        .money-input-wrap .field-input { padding-left: 40px; font-weight: 600; font-size: 1.1rem;}
 
         .quick-amounts {
             display: flex;
             flex-wrap: wrap;
-            gap: 6px;
-            margin-top: 8px;
+            gap: 8px;
+            margin-top: 10px;
         }
 
         .quick-btn {
-            padding: 5px 12px;
-            background: rgba(212, 168, 50, 0.1);
-            border: 1px solid rgba(212, 168, 50, 0.25);
+            padding: 6px 14px;
+            background: white;
+            border: 1px solid var(--border);
             border-radius: 99px;
-            color: var(--gold);
-            font-family: 'Sarabun', sans-serif;
-            font-size: 0.82rem;
-            font-weight: 600;
+            color: var(--text-main);
+            font-family: 'Prompt', sans-serif;
+            font-size: 0.85rem;
             cursor: pointer;
-            transition: all 0.18s;
+            transition: all 0.2s;
         }
 
-        .quick-btn:hover {
-            background: rgba(212, 168, 50, 0.2);
-        }
+        .quick-btn:active { background: var(--bg); transform: scale(0.95); }
 
-        .ocr-raw {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 8px;
-            padding: 10px 12px;
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            max-height: 80px;
-            overflow-y: auto;
-            margin-bottom: 4px;
-            line-height: 1.5;
-            white-space: pre-wrap;
-        }
-
-        .ocr-hint {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-bottom: 14px;
-        }
-
-        .field-select {
-            width: 100%;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1.5px solid rgba(212, 168, 50, 0.2);
-            border-radius: 10px;
-            padding: 10px 14px;
-            color: var(--text);
-            font-family: 'Sarabun', sans-serif;
-            font-size: 1rem;
-            transition: border-color 0.2s;
-            -webkit-appearance: none;
-        }
-
-        .field-select:focus {
-            outline: none;
-            border-color: var(--gold);
-        }
-
-        .field-select option {
-            background: #2a1520;
-        }
-
-        /* Summary / List */
-        .stat-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-        }
-
-        .stat-row:last-child {
-            border-bottom: none;
-        }
-
-        .stat-label {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-        }
-
-        .stat-value {
-            font-weight: 700;
-            font-size: 1.05rem;
-            color: var(--gold);
-        }
-
-        .stat-total {
-            font-size: 1.2rem;
-            color: var(--gold-light);
-        }
-
-        .guest-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
-        }
-
-        .guest-item:last-child {
-            border-bottom: none;
-        }
-
-        .guest-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--gold-dark), var(--gold));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
-            font-weight: 700;
-            color: #1a0a12;
-            flex-shrink: 0;
-        }
-
-        .guest-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .guest-name {
-            font-weight: 600;
-            font-size: 0.95rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .guest-meta {
-            font-size: 0.78rem;
-            color: var(--text-muted);
-            margin-top: 2px;
-        }
-
-        .guest-amount {
-            font-weight: 700;
-            font-size: 1rem;
-            color: var(--success);
-            text-align: right;
-        }
-
-        .guest-amount span {
-            display: block;
-            font-size: 0.7rem;
-            font-weight: 400;
-            color: var(--text-muted);
-        }
-
-        .guest-del {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            cursor: pointer;
-            padding: 4px;
-            font-size: 1rem;
-            transition: color 0.2s;
-        }
-
-        .guest-del:hover {
-            color: var(--danger);
-        }
-
-        .synced-dot {
-            font-size: 0.65rem;
-            display: inline-block;
-            margin-left: 4px;
-        }
-
+        /* List & Search */
         .search-wrap {
             position: relative;
-            margin-bottom: 14px;
+            margin-bottom: 8px;
         }
 
         .search-icon {
             position: absolute;
-            left: 12px;
+            left: 16px;
             top: 50%;
             transform: translateY(-50%);
             color: var(--text-muted);
@@ -639,205 +444,281 @@
 
         .search-input {
             width: 100%;
-            background: var(--card2);
-            border: 1.5px solid rgba(255, 255, 255, 0.08);
-            border-radius: 10px;
-            padding: 10px 14px 10px 36px;
-            color: var(--text);
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 16px 12px 42px;
+            color: var(--text-main);
             font-family: 'Sarabun', sans-serif;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
+            transition: all 0.2s;
         }
-
+        
         .search-input:focus {
             outline: none;
-            border-color: rgba(212, 168, 50, 0.4);
+            border-color: var(--primary);
+            background: white;
         }
 
-        .empty {
-            text-align: center;
-            padding: 40px 20px;
+        .guest-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .guest-item:last-child { border-bottom: none; }
+
+        .guest-avatar {
+            width: 46px;
+            height: 46px;
+            border-radius: 14px;
+            background: var(--secondary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--secondary);
+            flex-shrink: 0;
+            font-family: 'Prompt', sans-serif;
+        }
+
+        .guest-info { flex: 1; min-width: 0; }
+
+        .guest-name {
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--text-main);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 2px;
+        }
+
+        .guest-meta {
+            font-size: 0.8rem;
             color: var(--text-muted);
         }
 
-        .empty .icon {
-            font-size: 3rem;
-            margin-bottom: 10px;
+        .guest-amount-wrap {
+            text-align: right;
         }
 
-        .export-btn {
+        .guest-amount {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--success);
+            font-family: 'Prompt', sans-serif;
+        }
+
+        .guest-amount span {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 400;
+            color: var(--text-muted);
+            font-family: 'Sarabun', sans-serif;
+            margin-top: 2px;
+        }
+
+        .guest-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .guest-del {
+            background: var(--danger-light);
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
             display: flex;
             align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            background: rgba(212, 168, 50, 0.1);
-            border: 1px solid rgba(212, 168, 50, 0.25);
-            border-radius: 99px;
-            color: var(--gold);
-            font-family: 'Sarabun', sans-serif;
-            font-size: 0.82rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.18s;
+            justify-content: center;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            margin-left: 8px;
+            flex-shrink: 0;
         }
 
-        .export-btn:hover {
-            background: rgba(212, 168, 50, 0.2);
+        .guest-del:active { transform: scale(0.9); }
+
+        .synced-dot { font-size: 0.65rem; margin-left: 4px; }
+
+        /* Summary Stats */
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 0;
+            border-bottom: 1px dashed var(--border);
+        }
+
+        .stat-row:last-child { border-bottom: none; }
+
+        .stat-label { color: var(--text-muted); font-size: 0.95rem; }
+
+        .stat-value {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--text-main);
+            font-family: 'Prompt', sans-serif;
+        }
+
+        .stat-total {
+            font-size: 1.4rem;
+            color: var(--primary-dark);
+            font-weight: 700;
         }
 
         .badge {
             display: inline-block;
-            padding: 2px 8px;
-            border-radius: 99px;
-            font-size: 0.7rem;
-            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            font-family: 'Prompt', sans-serif;
         }
 
-        .badge-family {
-            background: rgba(232, 160, 180, 0.2);
-            color: var(--pink);
-        }
-
-        .badge-friend {
-            background: rgba(76, 175, 130, 0.2);
-            color: var(--success);
-        }
-
-        .badge-work {
-            background: rgba(212, 168, 50, 0.2);
-            color: var(--gold);
-        }
-
-        .badge-other {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-muted);
-        }
+        .badge-family { background: #FCE7F3; color: #DB2777; }
+        .badge-friend { background: #E0E7FF; color: #4F46E5; }
+        .badge-work { background: #FEF3C7; color: #D97706; }
+        .badge-other { background: #F3F4F6; color: #4B5563; }
 
         /* Toast */
         .toast {
             position: fixed;
-            bottom: 24px;
+            top: 24px;
             left: 50%;
-            transform: translateX(-50%) translateY(80px);
-            background: var(--success);
+            transform: translateX(-50%) translateY(-100px);
+            background: var(--text-main);
             color: white;
-            padding: 12px 24px;
-            border-radius: 99px;
-            font-family: 'Sarabun', sans-serif;
-            font-weight: 600;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-family: 'Prompt', sans-serif;
+            font-weight: 500;
             font-size: 0.9rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             z-index: 9999;
             white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .toast.show {
-            transform: translateX(-50%) translateY(0);
-        }
+        .toast.show { transform: translateX(-50%) translateY(0); }
 
         /* Modal */
         .modal-overlay {
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
             z-index: 1000;
             align-items: center;
             justify-content: center;
             padding: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
-        .modal-overlay.show {
-            display: flex;
-        }
+        .modal-overlay.show { display: flex; opacity: 1; }
 
         .modal {
             background: var(--card);
-            border-radius: 20px;
-            padding: 24px;
+            border-radius: var(--radius-lg);
+            padding: 28px;
             width: 100%;
             max-width: 420px;
-            border: 1px solid rgba(212, 168, 50, 0.2);
-            animation: slideIn 0.3s ease;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            transform: translateY(20px);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
+        .modal-overlay.show .modal { transform: translateY(0); }
+
         .modal-title {
-            font-size: 1rem;
+            font-size: 1.2rem;
             font-weight: 700;
-            color: var(--gold);
+            color: var(--text-main);
             margin-bottom: 16px;
         }
 
         .modal-body {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            line-height: 1.7;
-            margin-bottom: 16px;
-        }
-
-        .modal-body code {
-            background: rgba(0, 0, 0, 0.4);
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-family: monospace;
-            font-size: 0.82rem;
-            color: var(--gold-light);
+            font-size: 0.95rem;
+            color: var(--text-main);
+            line-height: 1.6;
+            margin-bottom: 20px;
         }
 
         .step-list {
             counter-reset: step;
             list-style: none;
             padding: 0;
-            margin: 10px 0;
+            margin: 16px 0;
         }
 
         .step-list li {
             counter-increment: step;
-            padding: 6px 0 6px 32px;
+            padding: 8px 0 8px 36px;
             position: relative;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid var(--border);
             font-size: 0.85rem;
+            color: var(--text-main);
         }
-
-        .step-list li:last-child {
-            border-bottom: none;
-        }
+        .step-list li:last-child { border-bottom: none; }
 
         .step-list li::before {
             content: counter(step);
             position: absolute;
             left: 0;
-            top: 6px;
-            width: 22px;
-            height: 22px;
+            top: 8px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
-            background: rgba(212, 168, 50, 0.2);
-            color: var(--gold);
+            background: var(--primary-dark);
+            color: white;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 0.75rem;
             font-weight: 700;
+            font-family: 'Prompt', sans-serif;
         }
 
-        .url-input-wrap {
-            margin-top: 14px;
-        }
-
-        .url-hint {
-            font-size: 0.75rem;
+        input[type="file"] { display: none; }
+        
+        .empty {
+            text-align: center;
+            padding: 40px 20px;
             color: var(--text-muted);
-            margin-top: 6px;
         }
-
-        .modal-footer {
-            display: flex;
-            gap: 10px;
-            margin-top: 16px;
+        .empty .icon {
+            font-size: 3rem;
+            margin-bottom: 12px;
+            opacity: 0.5;
         }
-
-        input[type="file"] {
-            display: none;
+        
+        /* Gemini generated content box */
+        .generated-text-box {
+            background: var(--bg);
+            border: 1px solid var(--primary-dark);
+            padding: 16px;
+            border-radius: 12px;
+            font-family: 'Sarabun', sans-serif;
+            font-size: 1rem;
+            color: var(--text-main);
+            white-space: pre-wrap;
+            min-height: 80px;
         }
     </style>
 </head>
@@ -846,94 +727,77 @@
     <div class="container">
 
         <header>
-            <div class="emoji">🌸</div>
-            <h1>ซองแต่งงาน</h1>
-            <p>บันทึกรายชื่อและของขวัญจากแขกทุกท่าน</p>
+            <div class="emoji">💍</div>
+            <h1>ระบบซองแต่งงาน</h1>
+            <p>บันทึกรายชื่อและของขวัญจากแขกคนสำคัญ</p>
         </header>
 
         <!-- Google Sheets status bar -->
         <div class="sheets-bar not-set" id="sheets-bar" onclick="openSheetsModal()">
             <div class="sheets-dot off" id="sheets-dot"></div>
-            <div class="sheets-label" id="sheets-label">☁️ ยังไม่ได้เชื่อม Google Sheets —
-                <strong>แตะเพื่อตั้งค่า</strong></div>
-            <span style="color:var(--text-muted); font-size:0.8rem;">⚙️</span>
-        </div>
-
-        <!-- Tabs -->
-        <div class="tabs">
-            <button class="tab active" onclick="switchTab('scan')">📷 สแกนซอง</button>
-            <button class="tab" onclick="switchTab('list')">📋 รายชื่อ</button>
-            <button class="tab" onclick="switchTab('summary')">📊 สรุป</button>
+            <div class="sheets-label" id="sheets-label">ยังไม่ได้เชื่อม Google Sheets<br><span style="font-size:0.75rem; font-weight:normal; color:var(--text-muted);">แตะเพื่อตั้งค่าการเชื่อมต่อ</span></div>
+            <span style="color:var(--text-muted); font-size:1.2rem;">⚙️</span>
         </div>
 
         <!-- SCAN section -->
         <div class="section active" id="tab-scan">
             <div class="card">
-                <div class="card-title">📷 ถ่ายรูปหรืออัปโหลดรูป</div>
+                <div class="card-title">📷 สแกนซองหน้างาน</div>
                 <div class="camera-wrapper" id="camera-wrapper">
                     <video id="video" autoplay playsinline></video>
                     <canvas id="canvas"></canvas>
                     <img id="preview-img" alt="ภาพที่ถ่าย" />
                     <div class="capture-flash" id="flash"></div>
                     <div class="camera-placeholder" id="cam-placeholder">
-                        <div class="icon">📷</div>
-                        <p>กดปุ่มด้านล่างเพื่อเปิดกล้อง<br>หรืออัปโหลดรูปภาพ</p>
+                        <div class="icon">📸</div>
+                        <p>แตะปุ่มด้านล่างเพื่อเปิดกล้อง<br>หรืออัปโหลดรูปภาพซอง</p>
                     </div>
                 </div>
                 <div class="btn-row">
-                    <button class="btn btn-gold" onclick="startCamera()">🎥 เปิดกล้อง</button>
+                    <button class="btn btn-primary" onclick="startCamera()">🎥 เปิดกล้อง</button>
                     <label class="btn btn-outline" style="cursor:pointer;">
-                        🖼 อัปโหลด
+                        🖼 อัปโหลดรูป
                         <input type="file" id="file-input" accept="image/*" onchange="handleFile(event)" />
                     </label>
                 </div>
-                <div id="capture-row" style="display:none; margin-top:10px;">
-                    <button class="btn btn-pink" onclick="capturePhoto()">📸 ถ่ายภาพ</button>
+                <div id="capture-row" style="display:none; margin-top:16px;">
+                    <button class="btn btn-primary" onclick="capturePhoto()" style="padding: 16px; font-size: 1.1rem; background:linear-gradient(135deg, var(--primary), #D65A72);">✨ สแกนด้วย AI</button>
                 </div>
-                <div id="retake-row" style="display:none; margin-top:10px;">
+                <div id="retake-row" style="display:none; margin-top:16px;">
                     <button class="btn btn-outline" onclick="retake()">🔄 ถ่ายใหม่</button>
                 </div>
             </div>
 
-            <!-- OCR loading -->
-            <div class="ocr-status" id="ocr-status">
+            <!-- AI loading -->
+            <div class="ai-status" id="ai-status">
                 <div class="spinner"></div>
-                <div style="color:var(--gold); font-weight:600;">กำลังอ่านชื่อจากรูป...</div>
-                <div style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;" id="ocr-msg">กรุณารอสักครู่
-                </div>
-                <div class="progress-bar-wrap">
-                    <div class="progress-bar" id="progress-bar"></div>
-                </div>
+                <div style="color:var(--primary-dark); font-weight:600; font-family:'Prompt',sans-serif;">✨ Gemini AI กำลังวิเคราะห์...</div>
+                <div style="font-size:0.85rem; color:var(--text-muted); margin-top:6px;">กำลังถอดรหัสลายมือบนซอง</div>
             </div>
 
             <!-- Review panel -->
             <div id="review-panel">
                 <div class="card">
-                    <div class="card-title">🔍 ตรวจสอบข้อมูล</div>
-                    <div class="field-group">
-                        <label class="field-label">📝 ข้อความที่อ่านได้จากรูป</label>
-                        <div class="ocr-raw" id="ocr-raw">-</div>
-                        <div class="ocr-hint">* ตรวจสอบและแก้ไขข้อมูลด้านล่างก่อนบันทึก</div>
-                    </div>
+                    <div class="card-title">✨ ตรวจสอบข้อมูล</div>
+                    
                     <div class="field-group">
                         <label class="field-label">👤 ชื่อแขก</label>
-                        <input class="field-input" type="text" id="guest-name" placeholder="ชื่อ-นามสกุล" />
+                        <input class="field-input" type="text" id="guest-name" placeholder="ชื่อ-นามสกุล ผู้ใส่ซอง" />
                     </div>
                     <div class="field-group">
                         <label class="field-label">👥 ความสัมพันธ์</label>
                         <select class="field-select" id="guest-relation">
-                            <option value="family">👨‍👩‍👧 ครอบครัว</option>
+                            <option value="family">👨‍👩‍👧 ครอบครัว / ญาติ</option>
                             <option value="friend" selected>👫 เพื่อน</option>
                             <option value="work">💼 เพื่อนร่วมงาน</option>
-                            <option value="other">🙏 อื่นๆ</option>
+                            <option value="other">🙏 อื่นๆ / แขกผู้ใหญ่</option>
                         </select>
                     </div>
                     <div class="field-group">
-                        <label class="field-label">💰 จำนวนเงิน (บาท)</label>
+                        <label class="field-label">💰 จำนวนเงินที่ใส่ซอง (บาท)</label>
                         <div class="money-input-wrap">
                             <span class="currency">฿</span>
-                            <input class="field-input" type="number" id="guest-amount" placeholder="0" min="0"
-                                step="100" />
+                            <input class="field-input" type="number" id="guest-amount" placeholder="0" min="0" step="100" />
                         </div>
                         <div class="quick-amounts">
                             <button class="quick-btn" onclick="setAmount(500)">500</button>
@@ -945,38 +809,35 @@
                         </div>
                     </div>
                     <div class="field-group">
-                        <label class="field-label">📌 หมายเหตุ</label>
-                        <input class="field-input" type="text" id="guest-note"
-                            placeholder="เช่น มากับครอบครัว, ส่งซองมา" />
+                        <label class="field-label">📌 หมายเหตุ / คำอวยพรจากซอง</label>
+                        <input class="field-input" type="text" id="guest-note" placeholder="เช่น ยินดีด้วยนะ, มากับครอบครัว" />
                     </div>
+
                     <div class="btn-row">
-                        <button class="btn save-btn" id="save-btn" onclick="saveGuest()">✅ บันทึก</button>
-                        <button class="btn btn-outline btn-sm" onclick="cancelReview()"
-                            style="flex:0 0 auto; width:auto; padding:12px 20px;">ยกเลิก</button>
+                        <button class="btn btn-save" id="save-btn" onclick="saveGuest()">✅ บันทึกข้อมูล</button>
+                        <button class="btn btn-outline" onclick="cancelReview()" style="flex:0 0 auto; width:auto;">ยกเลิก</button>
                     </div>
                 </div>
             </div>
 
-            <div style="text-align:center; margin-top:4px;">
-                <button class="btn btn-outline" style="max-width:220px; margin:0 auto;" onclick="showManual()">✏️
-                    กรอกเองโดยไม่ถ่ายรูป</button>
+            <div style="text-align:center; margin-top:16px;">
+                <button class="btn btn-outline" style="max-width:240px; margin:0 auto; background:white;" onclick="showManual()">✏️ กรอกข้อมูลเองโดยไม่ถ่ายรูป</button>
             </div>
         </div>
 
         <!-- LIST section -->
         <div class="section" id="tab-list">
-            <div class="card" style="padding-bottom:4px;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                    <div class="card-title" style="margin-bottom:0;">📋 รายชื่อแขก</div>
-                    <button class="export-btn" onclick="exportCSV()">⬇️ Export CSV</button>
+            <div class="card" style="padding-bottom:12px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                    <div class="card-title" style="margin-bottom:0;">📋 รายชื่อแขกทั้งหมด</div>
+                    <button class="quick-btn" style="border-color:var(--primary); color:var(--primary-dark);" onclick="exportCSV()">⬇️ ออกรายงาน (CSV)</button>
                 </div>
                 <div class="search-wrap">
                     <span class="search-icon">🔍</span>
-                    <input class="search-input" type="text" placeholder="ค้นหาชื่อแขก..." id="search-input"
-                        oninput="renderList()" />
+                    <input class="search-input" type="text" placeholder="ค้นหาชื่อแขก..." id="search-input" oninput="renderList()" />
                 </div>
             </div>
-            <div class="card" id="guest-list-container" style="padding-top:4px;"></div>
+            <div class="card" id="guest-list-container" style="padding-top:8px;"></div>
         </div>
 
         <!-- SUMMARY section -->
@@ -987,52 +848,102 @@
 
     </div>
 
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <div class="nav-item active" onclick="switchTab('scan')">
+            <div class="nav-icon">📷</div>
+            <span>สแกนซอง</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('list')">
+            <div class="nav-icon">📋</div>
+            <span>รายชื่อ</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('summary')">
+            <div class="nav-icon">📊</div>
+            <span>สรุปยอด</span>
+        </div>
+    </nav>
+
     <!-- Toast -->
     <div class="toast" id="toast"></div>
 
     <!-- Google Sheets Setup Modal -->
     <div class="modal-overlay" id="modal-overlay" onclick="closeSheetsModal(event)">
         <div class="modal">
-            <div class="modal-title">☁️ เชื่อม Google Sheets</div>
+            <div class="modal-title">☁️ เชื่อมต่อ Google Sheets</div>
             <div class="modal-body">
-                ต้องสร้าง <strong>Google Apps Script</strong> 1 ครั้ง เพื่อรับข้อมูลจากแอปนี้และเขียนลง Sheet ของคุณ
+                สร้าง <strong>Google Apps Script</strong> เพื่อรับข้อมูลจากแอปนี้และเขียนลง Spreadsheet ของคุณโดยอัตโนมัติ
                 <ol class="step-list">
                     <li>ไปที่ <strong>script.google.com</strong> → สร้างโปรเจกต์ใหม่</li>
-                    <li>ลบโค้ดเดิมออก แล้ว<strong>วางโค้ด</strong>จากกล่องด้านล่าง</li>
-                    <li>กด <strong>Deploy → New deployment</strong> → เลือก <em>Web app</em></li>
-                    <li>Execute as: <em>Me</em>, Who can access: <em>Anyone</em> → กด Deploy</li>
-                    <li>คัดลอก <strong>Web app URL</strong> มาวางด้านล่าง</li>
+                    <li>วางโค้ดจากปุ่มคัดลอกด้านล่าง ทับโค้ดเดิม</li>
+                    <li>กด <strong>Deploy → New deployment</strong> เลือกประเภท <em>Web app</em></li>
+                    <li>Execute as: <em>Me</em>, Who can access: <em>Anyone</em></li>
+                    <li>คัดลอก <strong>Web app URL</strong> ที่ได้มาวางด้านล่าง</li>
                 </ol>
-                <div style="margin-top:10px;">
-                    <button class="quick-btn" onclick="copyScript()" style="font-size:0.85rem; padding:8px 16px;">📋
-                        คัดลอกโค้ด Apps Script</button>
+                <div style="margin-top:16px; display:flex; gap:8px; justify-content:center; flex-wrap:wrap;">
+                    <button class="quick-btn" style="background:var(--primary-dark); color:white; border:none;" onclick="copyScript()">📋 คัดลอกโค้ด Apps Script</button>
+                    <button class="quick-btn" style="background:var(--info); color:white; border:none;" onclick="useDefaultScriptUrl()">🔗 ลิงก์เริ่มต้น</button>
                 </div>
             </div>
-            <div class="url-input-wrap">
-                <label class="field-label">🔗 Web App URL (จาก Apps Script)</label>
-                <input class="field-input" type="url" id="script-url-input"
-                    placeholder="https://script.google.com/macros/s/..." />
-                <div class="url-hint">วาง URL ที่ได้จากขั้นตอนที่ 5</div>
+            <div class="field-group">
+                <label class="field-label">🔗 Web App URL (ที่คัดลอกมา)</label>
+                <input class="field-input" type="url" id="script-url-input" placeholder="https://script.google.com/macros/s/..." />
             </div>
-            <div class="modal-footer">
-                <button class="btn btn-gold" onclick="saveScriptUrl()">✅ บันทึกและเชื่อมต่อ</button>
-                <button class="btn btn-outline btn-sm" onclick="closeSheetsModal(null)"
-                    style="width:auto; padding:12px 20px;">ยกเลิก</button>
+            <div class="btn-row">
+                <button class="btn btn-primary" onclick="saveScriptUrl()">✅ บันทึกการเชื่อมต่อ</button>
+                <button class="btn btn-outline" onclick="closeSheetsModal(null)" style="width:auto;">ยกเลิก</button>
             </div>
-            <div style="margin-top:12px; text-align:center;">
-                <button onclick="clearScriptUrl()"
-                    style="background:none; border:none; color:var(--danger); font-family:'Sarabun',sans-serif; font-size:0.8rem; cursor:pointer;">🗑
-                    ยกเลิกการเชื่อมต่อ</button>
+            <div style="margin-top:20px; text-align:center;">
+                <button onclick="clearScriptUrl()" style="background:none; border:none; color:var(--danger); font-family:'Prompt',sans-serif; font-size:0.85rem; cursor:pointer; font-weight:500;">🔌 ยกเลิกการเชื่อมต่อ Sheets</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Thank You Message Modal -->
+    <div class="modal-overlay" id="thankyou-modal" onclick="closeThankYouModal(event)">
+        <div class="modal">
+            <div class="modal-title">✨ สร้างข้อความขอบคุณโดย AI</div>
+            <div class="modal-body" id="thankyou-content" style="display:none;">
+                <p style="margin-bottom:12px; color:var(--text-muted); font-size:0.85rem;">ข้อความนี้ถูกสร้างขึ้นมาเพื่อให้เหมาะสมกับความสัมพันธ์และจำนวนเงินที่ใส่ซอง คุณสามารถคัดลอกไปส่ง LINE หรือ SMS ได้เลย</p>
+                <div class="generated-text-box" id="generated-msg-box"></div>
+            </div>
+            <div class="modal-body" id="thankyou-loading">
+                <div class="spinner" style="margin-top:20px; width:30px; height:30px;"></div>
+                <div style="text-align:center; margin-top:10px; color:var(--primary-dark);">กำลังร่างข้อความที่เหมาะสม...</div>
+            </div>
+            <div class="btn-row" id="thankyou-actions" style="display:none;">
+                <button class="btn btn-primary" onclick="copyThankYouMsg()">📋 คัดลอกข้อความ</button>
+                <button class="btn btn-outline" onclick="closeThankYouModal(null)" style="width:auto;">ปิด</button>
             </div>
         </div>
     </div>
 
     <script>
+        // ===== API Setup =====
+        const apiKey = ""; // Environment will provide API key
+        const GEMINI_MODEL = "gemini-2.5-flash-preview-09-2025";
+        const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
+
+        // Exponential Backoff Fetch
+        async function fetchWithRetry(url, options, retries = 5) {
+            const delays = [1000, 2000, 4000, 8000, 16000];
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return await response.json();
+                } catch (e) {
+                    if (i === retries - 1) throw e;
+                    await new Promise(res => setTimeout(res, delays[i]));
+                }
+            }
+        }
+
         // ===== Apps Script template =====
         const APPS_SCRIPT_CODE = `function doPost(e) {
   try {
     var data = JSON.parse(e.postData.contents);
-    var ss = SpreadsheetApp.openById('1l8bcxgzwZQHl5GYSQeBHXhW79UDxkZHCqLmqyAmyIHI');
+    var ss = SpreadsheetApp.openById('1l8bcxgzwZQHl5GYSQeBHXhW79UDxkZHCqLmqyAmyIHI'); // *อย่าลืมเปลี่ยน ID เป็นของคุณ*
     var sheet = ss.getActiveSheet();
 
     // Add header row if sheet is empty
@@ -1062,11 +973,13 @@ function doGet(e) {
         // ===== State =====
         let guests = JSON.parse(localStorage.getItem('weddingGuests') || '[]');
         let stream = null;
-        let currentTab = 'scan';
         let scriptUrl = localStorage.getItem('sheetsScriptUrl') || '';
+        let currentGeneratedText = "";
 
         // Init
         updateSheetsBar();
+        renderList(); 
+        renderSummary(); 
 
         // ===== Sheets Bar =====
         function updateSheetsBar() {
@@ -1076,15 +989,15 @@ function doGet(e) {
             if (scriptUrl) {
                 bar.classList.remove('not-set');
                 dot.classList.remove('off');
-                label.innerHTML = '☁️ เชื่อม Google Sheets แล้ว &nbsp;<strong>แตะเพื่อเปลี่ยน</strong>';
+                label.innerHTML = '<strong>เชื่อมต่อ Google Sheets แล้ว</strong><br><span style="font-size:0.75rem; font-weight:normal; color:var(--text-main);">แตะเพื่อแก้ไขการเชื่อมต่อ</span>';
             } else {
                 bar.classList.add('not-set');
                 dot.classList.add('off');
-                label.innerHTML = '☁️ ยังไม่ได้เชื่อม Google Sheets — <strong>แตะเพื่อตั้งค่า</strong>';
+                label.innerHTML = '<strong>ยังไม่ได้เชื่อม Google Sheets</strong><br><span style="font-size:0.75rem; font-weight:normal; color:var(--text-muted);">แตะเพื่อตั้งค่าการเชื่อมต่อ</span>';
             }
         }
 
-        // ===== Modal =====
+        // ===== Modals =====
         function openSheetsModal() {
             document.getElementById('script-url-input').value = scriptUrl;
             document.getElementById('modal-overlay').classList.add('show');
@@ -1096,15 +1009,15 @@ function doGet(e) {
         }
         function saveScriptUrl() {
             const url = document.getElementById('script-url-input').value.trim();
-            if (url && !url.startsWith('https://script.google.com/macros/s/')) {
-                showToast('❌ URL ไม่ถูกต้อง ต้องขึ้นต้นด้วย https://script.google.com/macros/s/', '#e05050');
+            if (url && !url.startsWith('https://script.google.com/')) {
+                showToast('❌ URL ไม่ถูกต้อง ต้องขึ้นต้นด้วย https://script.google.com/...', 'var(--danger)');
                 return;
             }
             scriptUrl = url;
             localStorage.setItem('sheetsScriptUrl', url);
             updateSheetsBar();
             document.getElementById('modal-overlay').classList.remove('show');
-            showToast(url ? '✅ เชื่อม Google Sheets สำเร็จ!' : '🔌 ยกเลิกการเชื่อมต่อแล้ว');
+            showToast(url ? '✅ เชื่อมต่อ Google Sheets สำเร็จ!' : '🔌 ยกเลิกการเชื่อมต่อแล้ว');
         }
         function clearScriptUrl() {
             scriptUrl = '';
@@ -1112,36 +1025,53 @@ function doGet(e) {
             document.getElementById('script-url-input').value = '';
             updateSheetsBar();
             document.getElementById('modal-overlay').classList.remove('show');
-            showToast('🔌 ยกเลิกการเชื่อมต่อแล้ว', '#a08090');
+            showToast('🔌 ยกเลิกการเชื่อมต่อแล้ว');
         }
         function copyScript() {
             navigator.clipboard.writeText(APPS_SCRIPT_CODE).then(() => {
-                showToast('📋 คัดลอกโค้ดแล้ว! ไปวางใน Apps Script ได้เลย');
+                showToast('📋 คัดลอกโค้ดเรียบร้อย นำไปวางได้เลย');
             }).catch(() => {
-                // Fallback: show in textarea
                 const ta = document.createElement('textarea');
                 ta.value = APPS_SCRIPT_CODE;
                 document.body.appendChild(ta); ta.select();
                 document.execCommand('copy');
                 document.body.removeChild(ta);
-                showToast('📋 คัดลอกโค้ดแล้ว!');
+                showToast('📋 คัดลอกโค้ดเรียบร้อย');
+            });
+        }
+        
+        function useDefaultScriptUrl() {
+            document.getElementById('script-url-input').value = 'https://script.google.com/macros/s/AKfycbxd2o13nswGeHHgMyUtIQex3wWnOb5MY41PnW_rQghvjQAAwWKVf_yiYvW7erJjXJSJ/exec';
+            showToast('🔗 วางลิงก์เริ่มต้นแล้ว กดบันทึกได้เลย', 'var(--info)');
+        }
+
+        function closeThankYouModal(e) {
+            if (e === null || e.target === document.getElementById('thankyou-modal')) {
+                document.getElementById('thankyou-modal').classList.remove('show');
+            }
+        }
+
+        function copyThankYouMsg() {
+            navigator.clipboard.writeText(currentGeneratedText).then(() => {
+                showToast('📋 คัดลอกข้อความขอบคุณเรียบร้อยแล้ว');
+                closeThankYouModal(null);
             });
         }
 
-        // ===== Tab =====
+        // ===== Tab Navigation =====
         function switchTab(tab) {
-            currentTab = tab;
-            document.querySelectorAll('.tab').forEach((t, i) => {
+            document.querySelectorAll('.nav-item').forEach((t, i) => {
                 t.classList.toggle('active', ['scan', 'list', 'summary'][i] === tab);
             });
             document.querySelectorAll('.section').forEach((s, i) => {
                 s.classList.toggle('active', ['tab-scan', 'tab-list', 'tab-summary'][i] === `tab-${tab}`);
             });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
             if (tab === 'list') renderList();
             if (tab === 'summary') renderSummary();
         }
 
-        // ===== Camera =====
+        // ===== Camera & AI Image Scanning =====
         async function startCamera() {
             try {
                 stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
@@ -1152,9 +1082,9 @@ function doGet(e) {
                 document.getElementById('capture-row').style.display = 'block';
                 document.getElementById('retake-row').style.display = 'none';
                 document.getElementById('review-panel').classList.remove('show');
-                document.getElementById('ocr-status').classList.remove('show');
+                document.getElementById('ai-status').classList.remove('show');
             } catch (e) {
-                showToast('❌ ไม่สามารถเปิดกล้องได้ กรุณาอนุญาตการเข้าถึงกล้อง', '#e05050');
+                showToast('❌ ไม่สามารถเปิดกล้องได้ กรุณาอนุญาตการเข้าถึงกล้อง', 'var(--danger)');
             }
         }
 
@@ -1163,15 +1093,19 @@ function doGet(e) {
             const canvas = document.getElementById('canvas');
             canvas.width = video.videoWidth; canvas.height = video.videoHeight;
             canvas.getContext('2d').drawImage(video, 0, 0);
+            
             const flash = document.getElementById('flash');
             flash.classList.add('flash'); setTimeout(() => flash.classList.remove('flash'), 200);
+            
             const img = document.getElementById('preview-img');
-            img.src = canvas.toDataURL('image/jpeg', 0.9); img.style.display = 'block';
+            img.src = canvas.toDataURL('image/jpeg', 0.8); img.style.display = 'block';
             video.style.display = 'none';
             document.getElementById('capture-row').style.display = 'none';
             document.getElementById('retake-row').style.display = 'block';
+            
             if (stream) stream.getTracks().forEach(t => t.stop());
-            runOCR(canvas.toDataURL('image/jpeg', 0.9));
+            
+            runGeminiVision(canvas.toDataURL('image/jpeg', 0.8));
         }
 
         function handleFile(e) {
@@ -1184,8 +1118,9 @@ function doGet(e) {
                 document.getElementById('video').style.display = 'none';
                 document.getElementById('capture-row').style.display = 'none';
                 document.getElementById('retake-row').style.display = 'block';
+                
                 if (stream) stream.getTracks().forEach(t => t.stop());
-                runOCR(ev.target.result);
+                runGeminiVision(ev.target.result);
             };
             reader.readAsDataURL(file);
         }
@@ -1195,75 +1130,97 @@ function doGet(e) {
             document.getElementById('retake-row').style.display = 'none';
             document.getElementById('cam-placeholder').style.display = 'block';
             document.getElementById('review-panel').classList.remove('show');
-            document.getElementById('ocr-status').classList.remove('show');
+            document.getElementById('ai-status').classList.remove('show');
             document.getElementById('file-input').value = '';
         }
 
-        // ===== OCR =====
-        async function runOCR(imageData) {
-            const status = document.getElementById('ocr-status');
-            const msg = document.getElementById('ocr-msg');
-            const bar = document.getElementById('progress-bar');
+        // Process Image with Gemini Vision API
+        async function runGeminiVision(imageData) {
+            const status = document.getElementById('ai-status');
             status.classList.add('show');
             document.getElementById('review-panel').classList.remove('show');
+
             try {
-                const result = await Tesseract.recognize(imageData, 'tha+eng', {
-                    logger: m => {
-                        if (m.status === 'recognizing text') {
-                            const pct = Math.round(m.progress * 100);
-                            bar.style.width = pct + '%';
-                            msg.textContent = `กำลังประมวลผล ${pct}%`;
-                        } else {
-                            msg.textContent = m.status === 'loading language traineddata' ? 'กำลังโหลดภาษาไทย...' : m.status;
+                const base64Data = imageData.split(',')[1];
+                const payload = {
+                    contents: [{
+                        parts: [
+                            { text: "Extract the guest information from this Thai wedding envelope. Identify the guest's name (name) and any blessings or notes written on it (note). Return ONLY a JSON object." },
+                            { inlineData: { mimeType: "image/jpeg", data: base64Data } }
+                        ]
+                    }],
+                    generationConfig: {
+                        responseMimeType: "application/json",
+                        responseSchema: {
+                            type: "OBJECT",
+                            properties: {
+                                name: { type: "STRING", description: "The name of the guest written on the envelope" },
+                                note: { type: "STRING", description: "Any extra text, blessings, or details" }
+                            }
                         }
+                    },
+                    systemInstruction: { 
+                        parts: [{ text: "You are an AI assistant helping to digitize Thai wedding envelopes. You excel at reading Thai handwriting." }] 
                     }
+                };
+
+                const result = await fetchWithRetry(GEMINI_API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
                 });
+
                 status.classList.remove('show');
-                showReview(result.data.text.trim());
+                const rawResponse = result.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
+                let parsedData = {};
+                try {
+                    parsedData = JSON.parse(rawResponse);
+                } catch (err) {
+                    console.error("JSON Parse Error:", err);
+                }
+
+                showReview(parsedData.name || '', parsedData.note || '');
             } catch (e) {
+                console.error("Gemini Vision Error:", e);
                 status.classList.remove('show');
-                showReview('');
-                showToast('⚠️ อ่านข้อความไม่ได้ กรุณากรอกเอง', '#d4a832');
+                showReview('', '');
+                showToast('⚠️ AI ไม่สามารถอ่านรูปภาพนี้ได้ กรุณากรอกเอง', 'var(--secondary)');
             }
         }
 
-        function showReview(rawText) {
-            document.getElementById('ocr-raw').textContent = rawText || '(ไม่พบข้อความในรูป)';
-            const lines = rawText.split('\n').map(l => l.trim()).filter(l => l.length > 1);
-            let guessedName = '';
-            for (const line of lines) {
-                if (/^[\d\s\-\/]+$/.test(line)) continue;
-                if (line.length > 1 && line.length < 60) { guessedName = line; break; }
-            }
+        function showReview(guessedName, guessedNote) {
             document.getElementById('guest-name').value = guessedName;
             document.getElementById('guest-amount').value = '';
-            document.getElementById('guest-note').value = '';
+            document.getElementById('guest-note').value = guessedNote;
             document.getElementById('review-panel').classList.add('show');
-            document.getElementById('review-panel').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            setTimeout(() => {
+                document.getElementById('review-panel').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
         }
 
         function showManual() {
-            document.getElementById('ocr-raw').textContent = '(กรอกด้วยตนเอง)';
             document.getElementById('guest-name').value = '';
             document.getElementById('guest-amount').value = '';
             document.getElementById('guest-note').value = '';
             document.getElementById('review-panel').classList.add('show');
-            document.getElementById('review-panel').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            setTimeout(() => {
+                document.getElementById('review-panel').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
         }
 
         function cancelReview() {
             document.getElementById('review-panel').classList.remove('show');
         }
 
-        // ===== Save =====
+        // ===== Save Data =====
         async function saveGuest() {
             const name = document.getElementById('guest-name').value.trim();
             const amount = parseFloat(document.getElementById('guest-amount').value) || 0;
             const relation = document.getElementById('guest-relation').value;
             const note = document.getElementById('guest-note').value.trim();
 
-            if (!name) { showToast('❌ กรุณากรอกชื่อแขก', '#e05050'); return; }
-            if (amount <= 0) { showToast('❌ กรุณากรอกจำนวนเงิน', '#e05050'); return; }
+            if (!name) { showToast('❌ กรุณากรอกชื่อแขก', 'var(--danger)'); return; }
+            if (amount <= 0) { showToast('❌ กรุณากรอกจำนวนเงิน', 'var(--danger)'); return; }
 
             const guest = {
                 id: Date.now(), name, amount, relation, note,
@@ -1280,9 +1237,11 @@ function doGet(e) {
             document.getElementById('cam-placeholder').style.display = 'block';
             document.getElementById('file-input').value = '';
 
-            showToast(`✅ บันทึก ${name} (฿${amount.toLocaleString('th-TH')}) แล้ว`);
+            showToast(`✅ บันทึกคุณ ${name} (฿${amount.toLocaleString('th-TH')}) เรียบร้อย`, 'var(--success)');
+            
+            renderList();
+            renderSummary();
 
-            // Sync to Google Sheets
             if (scriptUrl) {
                 syncToSheets(guest);
             }
@@ -1290,7 +1249,7 @@ function doGet(e) {
 
         async function syncToSheets(guest) {
             try {
-                showToast('☁️ กำลังบันทึกลง Google Sheets...', '#5ab4e8');
+                showToast('☁️ กำลังซิงค์ไปที่ Google Sheets...', 'var(--info)');
                 const res = await fetch(scriptUrl, {
                     method: 'POST',
                     body: JSON.stringify({
@@ -1302,33 +1261,78 @@ function doGet(e) {
                     })
                 });
                 if (res.ok) {
-                    // Mark as synced
                     const idx = guests.findIndex(g => g.id === guest.id);
                     if (idx !== -1) { guests[idx].synced = true; save(); }
-                    showToast('☁️ บันทึกลง Google Sheets สำเร็จ!', '#4caf82');
+                    showToast('✅ ซิงค์ลง Google Sheets สำเร็จ!', 'var(--success)');
+                    renderList();
+                    renderSummary();
                 } else {
-                    showToast('⚠️ Google Sheets ตอบกลับผิดพลาด', '#d4a832');
+                    showToast('⚠️ Google Sheets ตอบกลับผิดพลาด โปรดลองใหม่ทีหลัง', 'var(--secondary)');
                 }
             } catch (e) {
-                showToast('⚠️ ไม่สามารถส่งข้อมูลไป Google Sheets ได้', '#d4a832');
+                showToast('⚠️ ไม่สามารถส่งข้อมูลไป Sheets ได้ ข้อมูลถูกเก็บไว้ในเครื่องแล้ว', 'var(--secondary)');
             }
         }
 
-        // Retry unsynced items
         async function syncPending() {
             if (!scriptUrl) return;
             const unsynced = guests.filter(g => !g.synced);
-            if (!unsynced.length) { showToast('✅ ข้อมูลทั้งหมดซิงค์แล้ว'); return; }
-            showToast(`🔄 กำลังซิงค์ ${unsynced.length} รายการ...`, '#5ab4e8');
+            if (!unsynced.length) { showToast('✅ ข้อมูลทั้งหมดซิงค์เรียบร้อยแล้ว'); return; }
+            showToast(`🔄 กำลังซิงค์ ${unsynced.length} รายการ...`, 'var(--info)');
             for (const g of unsynced) await syncToSheets(g);
+            renderList(); 
+            renderSummary();
         }
 
         function save() {
             localStorage.setItem('weddingGuests', JSON.stringify(guests));
         }
 
-        // ===== Quick Amounts =====
         function setAmount(n) { document.getElementById('guest-amount').value = n; }
+
+        // ===== AI Thank You Text Generator =====
+        async function generateThankYou(id) {
+            const guest = guests.find(g => g.id === id);
+            if (!guest) return;
+
+            document.getElementById('thankyou-modal').classList.add('show');
+            document.getElementById('thankyou-content').style.display = 'none';
+            document.getElementById('thankyou-actions').style.display = 'none';
+            document.getElementById('thankyou-loading').style.display = 'block';
+
+            const relationText = relationLabel(guest.relation);
+            const userPrompt = `เขียนข้อความขอบคุณแขกที่มาร่วมงานแต่งงานหรือฝากซองมา ชื่อแขก: ${guest.name}, ความสัมพันธ์: ${relationText}, ใส่ซองจำนวน: ${guest.amount} บาท.
+คำสั่ง:
+- เขียนให้สุภาพ แต่เป็นกันเองตามระดับความสัมพันธ์ (ถ้าเป็นผู้ใหญ่ให้ใช้คำทางการ ถ้าเป็นเพื่อนให้สนุกสนานเป็นกันเอง)
+- ความยาวไม่เกิน 3-4 บรรทัด
+- ใช้ emoji ประกอบให้น่ารัก
+- ตอบเฉพาะข้อความที่จะนำไปส่งต่อได้เลย ไม่ต้องมีคำอธิบายเพิ่มเติม`;
+
+            try {
+                const payload = {
+                    contents: [{ parts: [{ text: userPrompt }] }]
+                };
+
+                const result = await fetchWithRetry(GEMINI_API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                currentGeneratedText = result.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "เกิดข้อผิดพลาดในการสร้างข้อความ";
+                
+                document.getElementById('generated-msg-box').textContent = currentGeneratedText;
+                document.getElementById('thankyou-loading').style.display = 'none';
+                document.getElementById('thankyou-content').style.display = 'block';
+                document.getElementById('thankyou-actions').style.display = 'flex';
+                
+            } catch (e) {
+                console.error("Gemini Text Error:", e);
+                document.getElementById('thankyou-modal').classList.remove('show');
+                showToast('❌ ไม่สามารถเชื่อมต่อกับ AI ได้', 'var(--danger)');
+            }
+        }
+
 
         // ===== List =====
         function renderList() {
@@ -1336,15 +1340,15 @@ function doGet(e) {
             const filtered = guests.filter(g => g.name.toLowerCase().includes(q));
             const container = document.getElementById('guest-list-container');
             if (filtered.length === 0) {
-                container.innerHTML = `<div class="empty"><div class="icon">🌸</div><p>${q ? 'ไม่พบชื่อที่ค้นหา' : 'ยังไม่มีรายการ'}</p></div>`;
+                container.innerHTML = `<div class="empty"><div class="icon">🔍</div><p>${q ? 'ไม่พบชื่อที่ค้นหา' : 'ยังไม่มีข้อมูลรายชื่อแขก'}</p></div>`;
                 return;
             }
             const unsyncedCount = guests.filter(g => !g.synced && scriptUrl).length;
             let header = '';
             if (unsyncedCount > 0) {
-                header = `<div style="text-align:center; margin-bottom:12px;">
-      <button class="quick-btn" onclick="syncPending()" style="font-size:0.82rem;">
-        🔄 ซิงค์ที่ค้างอยู่ (${unsyncedCount} รายการ)
+                header = `<div style="text-align:center; margin-bottom:16px;">
+      <button class="quick-btn" onclick="syncPending()" style="font-size:0.85rem; background:var(--info); color:white; border:none;">
+        🔄 ซิงค์รายการที่ค้างอยู่ (${unsyncedCount} รายการ)
       </button>
     </div>`;
             }
@@ -1358,14 +1362,17 @@ function doGet(e) {
         </div>
         <div class="guest-meta">
           <span class="badge ${badgeClass(g.relation)}">${relationLabel(g.relation)}</span>
-          ${g.note ? ` · ${g.note}` : ''}
+          ${g.note ? ` <span style="margin:0 4px;">•</span> ${g.note}` : ''}
+        </div>
+        <div class="guest-actions">
+            <button class="quick-btn" style="background:#fff0f5; color:var(--primary-dark); border-color:#fbcfe8; padding:4px 10px; font-size:0.75rem; font-weight:600;" onclick="generateThankYou(${g.id})">✨ สร้างคำขอบคุณส่ง LINE</button>
         </div>
       </div>
-      <div class="guest-amount">
-        ฿${g.amount.toLocaleString('th-TH')}
-        <span>${g.time}</span>
+      <div class="guest-amount-wrap">
+          <div class="guest-amount">฿${g.amount.toLocaleString('th-TH')}</div>
+          <span style="display:block; font-size:0.7rem; color:var(--text-muted); margin-top:2px;">${g.time}</span>
+          <button class="guest-del" style="margin-top:8px; float:right;" onclick="deleteGuest(${g.id})" title="ลบรายการ">✕</button>
       </div>
-      <button class="guest-del" onclick="deleteGuest(${g.id})" title="ลบ">✕</button>
     </div>
   `).join('');
         }
@@ -1374,14 +1381,16 @@ function doGet(e) {
             return { family: 'badge-family', friend: 'badge-friend', work: 'badge-work', other: 'badge-other' }[r] || 'badge-other';
         }
         function relationLabel(r) {
-            return { family: 'ครอบครัว', friend: 'เพื่อน', work: 'เพื่อนร่วมงาน', other: 'อื่นๆ' }[r] || r;
+            return { family: 'ครอบครัว / ญาติ', friend: 'เพื่อน', work: 'เพื่อนร่วมงาน', other: 'อื่นๆ' }[r] || r;
         }
 
         function deleteGuest(id) {
-            if (!confirm('ต้องการลบรายการนี้?')) return;
+            if (!confirm('ยืนยันการลบรายการนี้?')) return;
             guests = guests.filter(g => g.id !== id);
-            save(); renderList();
-            showToast('🗑️ ลบรายการแล้ว', '#e05050');
+            save(); 
+            renderList();
+            renderSummary();
+            showToast('🗑️ ลบรายการเรียบร้อย', 'var(--danger)');
         }
 
         // ===== Summary =====
@@ -1392,22 +1401,22 @@ function doGet(e) {
             const syncedCount = guests.filter(g => g.synced).length;
 
             document.getElementById('summary-card').innerHTML = `
-    <div class="card-title">📊 สรุปภาพรวม</div>
+    <div class="card-title">📊 ภาพรวมของขวัญ</div>
     <div class="stat-row">
-      <span class="stat-label">👥 จำนวนแขกทั้งหมด</span>
-      <span class="stat-value">${guests.length} คน</span>
+      <span class="stat-label">👥 จำนวนแขกที่บันทึกแล้ว</span>
+      <span class="stat-value">${guests.length} ท่าน</span>
     </div>
     <div class="stat-row">
-      <span class="stat-label">💰 รวมทั้งหมด</span>
+      <span class="stat-label">💰 ยอดเงินรวมทั้งหมด</span>
       <span class="stat-value stat-total">฿${total.toLocaleString('th-TH')}</span>
     </div>
     <div class="stat-row">
-      <span class="stat-label">📈 เฉลี่ยต่อซอง</span>
+      <span class="stat-label">📈 เฉลี่ยต่อซอง (ประมาณ)</span>
       <span class="stat-value">฿${guests.length ? (total / guests.length).toLocaleString('th-TH', { maximumFractionDigits: 0 }) : 0}</span>
     </div>
     ${scriptUrl ? `<div class="stat-row">
-      <span class="stat-label">☁️ ซิงค์ Google Sheets</span>
-      <span class="stat-value" style="color:var(--success)">${syncedCount}/${guests.length}</span>
+      <span class="stat-label">☁️ สถานะส่งขึ้น Google Sheets</span>
+      <span class="stat-value" style="color:var(--success)">${syncedCount} / ${guests.length}</span>
     </div>` : ''}
   `;
 
@@ -1419,29 +1428,30 @@ function doGet(e) {
   `).join('');
 
             document.getElementById('summary-breakdown').innerHTML = `
-    <div class="card-title">🏷️ แยกตามความสัมพันธ์</div>
-    ${breakdown || '<div style="color:var(--text-muted);font-size:0.9rem;">ยังไม่มีข้อมูล</div>'}
+    <div class="card-title">🏷️ ยอดรวมแยกตามกลุ่มแขก</div>
+    ${breakdown || '<div style="color:var(--text-muted);font-size:0.9rem;text-align:center;padding:16px;">ยังไม่มีข้อมูล</div>'}
   `;
         }
 
         // ===== Export CSV =====
         function exportCSV() {
-            if (!guests.length) { showToast('❌ ยังไม่มีข้อมูล', '#e05050'); return; }
+            if (!guests.length) { showToast('❌ ยังไม่มีข้อมูลให้ Export', 'var(--danger)'); return; }
             const header = 'ชื่อ,ความสัมพันธ์,จำนวนเงิน,หมายเหตุ,วันเวลา';
             const rows = guests.map(g => `"${g.name}","${relationLabel(g.relation)}",${g.amount},"${g.note}","${g.time}"`);
             const csv = '\uFEFF' + [header, ...rows].join('\n');
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a'); a.href = url;
-            a.download = `ซองแต่งงาน_${new Date().toLocaleDateString('th-TH')}.csv`;
+            a.download = `รายงานซองแต่งงาน_${new Date().toLocaleDateString('th-TH').replace(/\//g,'-')}.csv`;
             a.click(); URL.revokeObjectURL(url);
-            showToast('📥 Export CSV สำเร็จ');
+            showToast('📥 ดาวน์โหลดไฟล์ CSV สำเร็จ');
         }
 
         // ===== Toast =====
-        function showToast(msg, color = '#4caf82') {
+        function showToast(msg, bgColor = 'var(--text-main)') {
             const t = document.getElementById('toast');
-            t.textContent = msg; t.style.background = color;
+            t.innerHTML = msg; 
+            t.style.background = bgColor;
             t.classList.add('show');
             setTimeout(() => t.classList.remove('show'), 3000);
         }
